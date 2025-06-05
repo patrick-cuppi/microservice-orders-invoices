@@ -12,6 +12,10 @@ const app = fastify().withTypeProvider<ZodTypeProvider>()
 app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
 
+app.get('/health', () => {
+    return 'OK'
+})
+
 app.post('/orders', {
     schema: {
         body: z.object({
@@ -19,6 +23,10 @@ app.post('/orders', {
         })
     }
 }, (request, reply) => {
+    const { amount } = request.body
+
+    console.log('New order received:', amount)
+
     return reply.status(201).send()
 })
 
