@@ -1,5 +1,5 @@
-import { invoices } from './invoices.ts'
+import { orders } from './orders.ts'
 
 export const channels = {
-    invoices,
+    orders,
 }

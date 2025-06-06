@@ -1,3 +1,4 @@
+import '../broker/subscriber.ts'
 import fastifyCors from '@fastify/cors'
 import { fastify } from 'fastify'
 import {
@@ -19,7 +20,7 @@ app.get('/health', () => {
 
 app.listen({
     host: '0.0.0.0',
-    port: 3333
+    port: 3334
 }).then(() => {
-    console.log('[Invoices] HTTP Server is running on http://localhost:3333')
+    console.log('[Invoices] HTTP Server is running on http://localhost:3334')
 })
