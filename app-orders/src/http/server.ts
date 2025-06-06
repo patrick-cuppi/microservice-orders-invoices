@@ -1,16 +1,16 @@
+import fastifyCors from '@fastify/cors'
+import '@opentelemetry/auto-instrumentations-node/register'
 import { fastify } from 'fastify'
 import {
     serializerCompiler,
     validatorCompiler,
     type ZodTypeProvider
 } from 'fastify-type-provider-zod'
-import { z } from 'zod'
-import { channels } from '../broker/channels/index.ts'
-import fastifyCors from '@fastify/cors'
-import { schema } from '../db/schema/index.ts'
-import { db } from '../db/client.ts'
 import { randomUUID } from 'node:crypto'
+import { z } from 'zod'
 import { dispatchOrderCreated } from '../broker/messages/order-created.ts'
+import { db } from '../db/client.ts'
+import { schema } from '../db/schema/index.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
