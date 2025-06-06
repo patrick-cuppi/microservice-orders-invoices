@@ -1,4 +1,5 @@
 import fastifyCors from '@fastify/cors'
+import { trace } from '@opentelemetry/api'
 import '@opentelemetry/auto-instrumentations-node/register'
 import { fastify } from 'fastify'
 import {
@@ -11,6 +12,8 @@ import { z } from 'zod'
 import { dispatchOrderCreated } from '../broker/messages/order-created.ts'
 import { db } from '../db/client.ts'
 import { schema } from '../db/schema/index.ts'
+import { setTimeout } from 'node:timers/promises'
+import { tracer } from '../tracer/tracer.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -36,6 +39,18 @@ app.post('/orders', {
 
     const orderId = randomUUID()
 
+    await db.insert(schema.orders).values({
+        id: randomUUID(),
+        customerId: '39c2dbbe-ea6b-414a-9b48-52060051e92c',
+        amount,
+    })
+
+    const span = tracer.startSpan('test-span')
+    await setTimeout(2000)
+    span.end()
+
+    trace.getActiveSpan()?.setAttribute('order_id', orderId)
+
     dispatchOrderCreated({
         orderId,
         amount,
@@ -43,16 +58,6 @@ app.post('/orders', {
             id: '39c2dbbe-ea6b-414a-9b48-52060051e92c'
         }
     })
-
-    try {
-        await db.insert(schema.orders).values({
-            id: randomUUID(),
-            customerId: '39c2dbbe-ea6b-414a-9b48-52060051e92c',
-            amount,
-        })
-    } catch (error) {
-        console.log(error)
-    }
 
     return reply.status(201).send()
 })
