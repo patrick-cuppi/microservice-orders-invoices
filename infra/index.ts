@@ -11,7 +11,7 @@ const ordersECRToken = aws.ecr.getAuthorizationTokenOutput({
     registryId: ordersECRRepository.repository.registryId,
 })
 
-export const ordersDockerImage = new docker.Image('orders-image', {
+const ordersDockerImage = new docker.Image('orders-image', {
     tags: [
         pulumi.interpolate`${ordersECRRepository.repository.repositoryUrl}:latest`
     ],
@@ -19,6 +19,9 @@ export const ordersDockerImage = new docker.Image('orders-image', {
         location: '../app-orders',
     },
     push: true,
+    platforms: [
+        'linux/amd64'
+    ],
     registries: [
         {
             address: ordersECRRepository.repository.repositoryUrl,
@@ -26,4 +29,19 @@ export const ordersDockerImage = new docker.Image('orders-image', {
             password: ordersECRToken.password
         }
     ]
+})
+
+const cluster = new awsx.classic.ecs.Cluster('app-cluster')
+
+const ordersService = new awsx.classic.ecs.FargateService('fargate-orders', {
+    cluster,
+    desiredCount: 1,
+    waitForSteadyState: false,
+    taskDefinitionArgs: {
+        container: {
+            image: ordersDockerImage.ref,
+            cpu: 256,
+            memory: 512,
+        },
+    },
 })
