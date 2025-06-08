@@ -17,6 +17,10 @@ export const ordersService = new awsx.classic.ecs.FargateService('fargate-orders
                 {
                     name: 'BROKER_URL',
                     value: pulumi.interpolate`amqp://admin:admin@${rabbitMQAdminHttpListener.endpoint.hostname}:${rabbitMQAdminHttpListener.endpoint.port}`
+                },
+                {
+                    name: 'DATABASE_URL',
+                    value: 'postgresql://orders_owner:npg_secretHere.us-east-1.aws.neon.tech/orders?sslmode=require'
                 }
             ],
         },
