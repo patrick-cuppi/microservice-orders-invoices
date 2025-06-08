@@ -18,6 +18,22 @@ export const rabbitMQAdminHttpListener = appLoadBalancer.createListener('rabbitm
     targetGroup: rabbitMQAdminTargetGroup,
 })
 
+const amqpTargetGroup = networkLoadBalancer.createTargetGroup('amqp-target', {
+    protocol: 'TCP',
+    port: 5672,
+    targetType: 'ip',
+    healthCheck: {
+        protocol: 'TCP',
+        port: '5672'
+    }
+})
+
+export const amqpListener = networkLoadBalancer.createListener('amqp-listener', {
+    port: 5672,
+    protocol: 'TCP',
+    targetGroup: amqpTargetGroup,
+})
+
 export const rabbitMQService = new awsx.classic.ecs.FargateService('fargate-rabbitmq', {
     cluster,
     desiredCount: 1,
@@ -29,6 +45,7 @@ export const rabbitMQService = new awsx.classic.ecs.FargateService('fargate-rabb
             memory: 512,
             portMappings: [
                 rabbitMQAdminHttpListener,
+                amqpListener
             ],
             environment: [
                 {
