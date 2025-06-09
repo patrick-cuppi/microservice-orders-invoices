@@ -29,6 +29,7 @@ export const ordersService = new awsx.classic.ecs.FargateService('fargate-orders
             image: ordersDockerImage.ref,
             cpu: 256,
             memory: 512,
+            portMappings: [ordersHttpListener],
             environment: [
                 {
                     name: 'BROKER_URL',
@@ -61,6 +62,10 @@ export const ordersService = new awsx.classic.ecs.FargateService('fargate-orders
                 {
                     name: 'OTEL_NODE_RESOURCE_DETECTORS',
                     value: 'env,host,os'
+                },
+                {
+                    name: 'OTEL_NODE_ENABLE_INSTRUMENTATIONS',
+                    value: 'http,fastify,pg,amqplib'
                 }
             ],
         },
