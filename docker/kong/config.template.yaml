@@ -3,7 +3,7 @@ _transform: true
 
 services:
   - name: orders
-    url: http://host.docker.internal:3333
+    url: ${KONG_ORDERS_URL}
     protocol: http
     host: host.docker.internal
     port: 3333
@@ -21,7 +21,7 @@ services:
           - /orders
 
   - name: invoices
-    url: http://host.docker.internal:3334
+    url: ${KONG_INVOICES_URL}
     protocol: http
     host: host.docker.internal
     port: 3334
