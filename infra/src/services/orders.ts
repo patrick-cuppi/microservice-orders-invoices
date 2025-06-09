@@ -3,6 +3,22 @@ import * as pulumi from '@pulumi/pulumi'
 import { cluster } from '../cluster'
 import { ordersDockerImage } from '../images/orders'
 import { amqpListener } from './rabbitmq'
+import { appLoadBalancer } from '../load-balancer'
+
+const ordersTargetGroup = appLoadBalancer.createTargetGroup('orders-target', {
+    port: 3333,
+    protocol: 'HTTP',
+    healthCheck: {
+        path: '/health',
+        protocol: 'HTTP',
+    },
+})
+
+export const ordersHttpListener = appLoadBalancer.createListener('orders-http', {
+    port: 3333,
+    protocol: 'HTTP',
+    targetGroup: ordersTargetGroup,
+})
 
 export const ordersService = new awsx.classic.ecs.FargateService('fargate-orders', {
     cluster,
